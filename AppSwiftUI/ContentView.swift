@@ -8,14 +8,53 @@
 import SwiftUI
 
 struct ContentView: View {
+    
+    @State private var checkAmount = ""
+    @State private var numperOfPeople = 2
+    @State private var tipPercentage = 0
+    
+    let tipPercentages = [0, 5, 10, 15, 20]
+    
+    var totalPerPerson: Double {
+        let peopleCount = Double(numperOfPeople + 2)
+        let tipSelection = Double(tipPercentages[tipPercentage])
+        let orderAmount = Double(checkAmount) ?? 0
+        
+        let tipValue = orderAmount / 100 * tipSelection
+        let grandTotal = orderAmount + tipValue
+        let amounPerPerson = grandTotal / peopleCount
+        
+        return amounPerPerson
+    }
+    
+    
     var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundColor(.accentColor)
-            Text("Hello, world!")
+        NavigationView {
+            Form {
+                Section {
+                    TextField("Amount", text: $checkAmount)
+                    Picker("Number of people", selection: $numperOfPeople) {
+                        ForEach(2..<100) {
+                            Text("\($0) people")
+                        }
+                    }
+                }
+                Section(header: Text("Сколько чаевых вы хотели бы оставить?")) {
+                    Picker("Tip percentage", selection: $tipPercentage) {
+                        ForEach(0..<tipPercentages.count) {
+                            Text("\(self.tipPercentages[$0])%")
+                        }
+                    }
+                    .pickerStyle(SegmentedPickerStyle())
+                }
+                
+                Section {
+                    Text("\(totalPerPerson, specifier:"%.2f")")
+                }
+            }
+            .navigationTitle("Калькулятор чаевых")
+            .navigationBarTitleDisplayMode(.inline)
         }
-        .padding()
     }
 }
 
